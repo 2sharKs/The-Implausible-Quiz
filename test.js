@@ -38,7 +38,8 @@ var questionaire = {
         ]
 
     ],
-    answer: ["theory", "embellish", "post-mortem", "artificial", "pay"]
+    answer: ["theory", "embellish", "post-mortem", "artificial", "pay"],
+    marked: ['0','0','0','0','0']
 };
 
 
@@ -57,6 +58,7 @@ document.querySelector(".start-test-btn").addEventListener("click", function () 
     displayCount();
     displayQuestion();
     document.querySelector(".test-clock").classList.remove("hidden");
+    startTimer();
     document.querySelector(".user-details").classList.remove("hidden");
     document.querySelector(".user-details").innerHTML = "Name: " + userName + "<br>Email: " + userMail;
     document.querySelector(".prev-btn").classList.add("disabled");
@@ -86,6 +88,7 @@ document.querySelector(".prev-btn").addEventListener("click", function () {
         }
         displayCount();
         displayQuestion();
+        recordedAttempt();
     }
 
 });
@@ -106,6 +109,7 @@ document.querySelector(".next-btn").addEventListener("click", function () {
         }
         displayCount();
         displayQuestion();
+        recordedAttempt();
     }
 
 });
@@ -116,28 +120,32 @@ document.querySelector(".next-btn").addEventListener("click", function () {
 document.querySelector(".the-1-option button").addEventListener("click", function () {
     document.querySelector(".the-1-option button").classList.add("active");
     deselectOthers(document.querySelector(".the-1-option button").innerHTML);
-    markedOption(document.querySelector(".the-1-option button").innerHTML);
+    
+    questionaire.marked[qCount-1]='1';
 });
 
 // option B
 document.querySelector(".the-2-option button").addEventListener("click", function () {
     document.querySelector(".the-2-option button").classList.add("active");
     deselectOthers(document.querySelector(".the-2-option button").innerHTML);
-    markedOption(document.querySelector(".the-2-option button").innerHTML);
+    
+    questionaire.marked[qCount-1]='2';
 });
 
 // option C
 document.querySelector(".the-3-option button").addEventListener("click", function () {
     document.querySelector(".the-3-option button").classList.add("active");
     deselectOthers(document.querySelector(".the-3-option button").innerHTML);
-    markedOption(document.querySelector(".the-3-option button").innerHTML);
+    
+    questionaire.marked[qCount-1]='3';
 });
 
 // option D
 document.querySelector(".the-4-option button").addEventListener("click", function () {
     document.querySelector(".the-4-option button").classList.add("active");
     deselectOthers(document.querySelector(".the-4-option button").innerHTML);
-    markedOption(document.querySelector(".the-4-option button").innerHTML);
+    
+    questionaire.marked[qCount-1]='4';
 });
 
 
@@ -146,8 +154,12 @@ document.querySelector(".the-4-option button").addEventListener("click", functio
 document.querySelector(".finish-btn").addEventListener("click",function(){
     result=0;
     for(var x=0;x<5;x++){
-        result+=attempt[x];
-        console.log(attempt[x]);
+        if(questionaire.options[x][questionaire.marked[x]-1]==questionaire.answer[x]){
+            result+=100;
+        }
+        else if(questionaire.marked[x]!=0)
+            result-=50;
+        
     }
     console.log(result);
 });
@@ -182,11 +194,48 @@ function deselectOthers(innerContent){
 }
 
 
-function markedOption(markedOp){
-    if(markedOp==questionaire.answer[qCount-1])
-        attempt[qCount-1]=100;
-    else
-        attempt[qCount-1]=-50;    
 
-    console.log(attempt[qCount]-1);
+function recordedAttempt(){
+    if(questionaire.marked[qCount-1]==0){
+        deselectOthers("unmarked");
+    }
+    if(questionaire.marked[qCount-1]!=0){
+    document.querySelector(".the-"+questionaire.marked[qCount-1]+"-option button").classList.add("active");
+    deselectOthers(document.querySelector(".the-"+questionaire.marked[qCount-1]+"-option button").innerHTML);
+    
+    }
+}
+
+
+//creating timer
+function startTimer() {
+    var timer = 60, minutes, seconds;
+    const timedec = setInterval(function () {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        document.querySelector(".time-left").textContent = "00:"+ minutes + ":" + seconds;
+
+        if (--timer < 0) {
+            clearInterval(timedec);
+            preResult();
+        }
+
+    }, 1000);
+}
+
+
+function preResult(){
+    document.querySelector(".question-num").classList.add("hidden");
+    document.querySelector(".test-clock").classList.add("hidden");
+    document.querySelector(".current-qn").classList.add("hidden");
+    document.querySelector(".qn-ans-window").innerHTML= "<h1>Calculating Result...</h1>";
+
+    setTimeout(() => {
+        document.querySelector(".qn-ans-window").innerHTML="<h1>You Scored "+result+"/500 marks. Well done( I guess :3 )</h1>";
+    } , 5000);
+
 }
