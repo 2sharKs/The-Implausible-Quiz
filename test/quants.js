@@ -215,7 +215,7 @@ function recordedAttempt() {
 
 //creating timer
 function startTimer() {
-    var timer = 60, minutes, seconds;
+    var timer = 5*60, minutes, seconds;
     const timedec = setInterval(function () {
         minutes = parseInt(timer / 60, 10);
         seconds = parseInt(timer % 60, 10);
